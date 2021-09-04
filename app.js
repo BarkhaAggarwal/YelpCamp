@@ -29,8 +29,8 @@ const { urlencoded } = require('express');
 const campground = require('./models/campground');
 
 const session= require('express-session');
-//const MongoDBStore = require("connect-mongo")(session);
- const MongoDBStore = require('connect-mongodb-session')(session);
+const MongoDBStore = require('connect-mongo');
+ //const MongoDBStore = require('connect-mongodb-session')(session);
 // (session)
 
 const dbUrl ='mongodb://localhost:27017/yelp-camp';
@@ -63,16 +63,15 @@ app.use(mongoSanitize({
 // process.env.SECRET ||
 const secret ='thisshouldbeabettersecret!';
 
-const store = new MongoDBStore({
-    url: dbUrl,
+const store = MongoDBStore.create({
+    mongoUrl: dbUrl,
     secret,
-    //collection:'mySessions',
     touchAfter: 24 * 60 * 60
 });
 
 
-store.on("error", function (e) {
-    console.log("SESSION STORE ERROR", e)
+store.on('error', function (e) {
+    console.log("SESSION STORE ERROR", e);
 })
 
 
@@ -91,52 +90,52 @@ const sessionConfig = {
 }
 app.use(session(sessionConfig));
 app.use(flash());
-app.use(helmet({contentSecurityPolicy: false}));
+app.use(helmet());
 // {contentSecurityPolicy: false}
 
-// const scriptSrcUrls = [
-//     "https://stackpath.bootstrapcdn.com/",
-//     "https://api.tiles.mapbox.com/",
-//     "https://api.mapbox.com/",
-//     "https://kit.fontawesome.com/",
-//     "https://cdnjs.cloudflare.com/",
-//     "https://cdn.jsdelivr.net/",
-// ];
-// const styleSrcUrls = [
-//     "https://kit-free.fontawesome.com/",
-//     "https://stackpath.bootstrapcdn.com/",
-//     "https://api.mapbox.com/",
-//     "https://api.tiles.mapbox.com/",
-//     "https://fonts.googleapis.com/",
-//     "https://use.fontawesome.com/",
-// ];
-// const connectSrcUrls = [
-//     "https://api.mapbox.com/",
-//     "https://a.tiles.mapbox.com/",
-//     "https://b.tiles.mapbox.com/",
-//     "https://events.mapbox.com/",
-// ];
-// const fontSrcUrls = [];
-// app.use(
-//     helmet.contentSecurityPolicy({
-//         directives: {
-//             defaultSrc: [],
-//             connectSrc: ["'self'", ...connectSrcUrls],
-//             scriptSrc: ["'unsafe-inline'", "'self'", ...scriptSrcUrls],
-//             styleSrc: ["'self'", "'unsafe-inline'", ...styleSrcUrls],
-//             workerSrc: ["'self'", "blob:"],
-//             objectSrc: [],
-//             imgSrc: [
-//                 "'self'",
-//                 "blob:",
-//                 "data:",
-//                 "https://res.cloudinary.com/dm7uivked/", //SHOULD MATCH YOUR CLOUDINARY ACCOUNT! 
-//                 "https://images.unsplash.com/",
-//             ],
-//             fontSrc: ["'self'", ...fontSrcUrls],
-//         },
-//     })
-// );
+const scriptSrcUrls = [
+    "https://stackpath.bootstrapcdn.com/",
+    "https://api.tiles.mapbox.com/",
+    "https://api.mapbox.com/",
+    "https://kit.fontawesome.com/",
+    "https://cdnjs.cloudflare.com/",
+    "https://cdn.jsdelivr.net/",
+];
+const styleSrcUrls = [
+    "https://kit-free.fontawesome.com/",
+    "https://stackpath.bootstrapcdn.com/",
+    "https://api.mapbox.com/",
+    "https://api.tiles.mapbox.com/",
+    "https://fonts.googleapis.com/",
+    "https://use.fontawesome.com/",
+];
+const connectSrcUrls = [
+    "https://api.mapbox.com/",
+    "https://a.tiles.mapbox.com/",
+    "https://b.tiles.mapbox.com/",
+    "https://events.mapbox.com/",
+];
+const fontSrcUrls = [];
+app.use(
+    helmet.contentSecurityPolicy({
+        directives: {
+            defaultSrc: [],
+            connectSrc: ["'self'", ...connectSrcUrls],
+            scriptSrc: ["'unsafe-inline'", "'self'", ...scriptSrcUrls],
+            styleSrc: ["'self'", "'unsafe-inline'", ...styleSrcUrls],
+            workerSrc: ["'self'", "blob:"],
+            objectSrc: [],
+            imgSrc: [
+                "'self'",
+                "blob:",
+                "data:",
+                "https://res.cloudinary.com/dm7uivked/", //SHOULD MATCH YOUR CLOUDINARY ACCOUNT! 
+                "https://images.unsplash.com/",
+            ],
+            fontSrc: ["'self'", ...fontSrcUrls],
+        },
+    })
+);
 
 app.use(passport.initialize());
 app.use(passport.session());
