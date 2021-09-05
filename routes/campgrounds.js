@@ -12,14 +12,14 @@ const upload = multer({ storage })
 
 router.route('/')
     .get( catchAsync (campgrounds.index))
-    .post(isLoggedIn,upload.array('image'), catchAsync(campgrounds.createCampground));
+    .post(isLoggedIn,upload.array('image'),validateCampground,catchAsync(campgrounds.createCampground));
 
 router.get('/new', isLoggedIn ,catchAsync(campgrounds.renderNewForm));
 
 
 router.route('/:id')
     .get( campgrounds.showCampground)
-    .put( isLoggedIn,isAuthor,upload.array('image'), catchAsync(campgrounds.updateCampground))
+    .put( isLoggedIn,isAuthor,upload.array('image'),validateCampground, catchAsync(campgrounds.updateCampground))
     .delete( isLoggedIn, isAuthor, catchAsync(campgrounds.deleteCampground));
 
 
